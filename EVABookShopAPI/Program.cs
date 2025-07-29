@@ -2,6 +2,8 @@ using EVABookShopAPI.DB;
 using Microsoft.EntityFrameworkCore;
 using Scrutor;
 using EVABookShopAPI.Service.Mappings;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +14,7 @@ builder.Services.AddDbContext<EVABookShopAPIContext>(options =>
 // Add response caching
 builder.Services.AddResponseCaching();
 
-// Register controllers with JsonPatch support and configure cache profiles
+// Register controllers and configure cache profiles
 builder.Services.AddControllers(options =>
 {
     options.CacheProfiles.Add("Default30", new Microsoft.AspNetCore.Mvc.CacheProfile
@@ -27,12 +29,46 @@ builder.Services.AddControllers(options =>
         Location = Microsoft.AspNetCore.Mvc.ResponseCacheLocation.Any,
         NoStore = false
     });
-})
-.AddNewtonsoftJson(); // Enable JsonPatch support
+});
 
-// Swagger
+// Add JsonPatch support
+builder.Services.AddMvc().AddNewtonsoftJson();
+
+// Configure API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0); // Default to v1.0
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(), // Reads version from URL segment (v{version})
+        new QueryStringApiVersionReader("version"), // Fallback: ?version=1.0
+        new HeaderApiVersionReader("X-Version") // Fallback: X-Version header
+    );
+    options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
+}).AddVersionedApiExplorer(setup =>
+{
+    setup.GroupNameFormat = "'v'VVV"; // Format: v1.0, v2.0, etc.
+    setup.SubstituteApiVersionInUrl = true;
+});
+
+// Swagger with versioning support
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Version = "v1.0",
+        Title = "EVA BookShop API v1.0",
+        Description = "BookShop API version 1.0"
+    });
+
+    options.SwaggerDoc("v2", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Version = "v2.0", 
+        Title = "EVA BookShop API v2.0",
+        Description = "BookShop API version 2.0"
+    });
+});
 
 // Service scanning via Scrutor
 builder.Services.Scan(selector => selector
@@ -54,7 +90,12 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "EVA BookShop API v1.0");
+        // Add more versions as needed
+        options.SwaggerEndpoint("/swagger/v2/swagger.json", "EVA BookShop API v2.0");
+    });
 }
 
 // Enable response caching middleware

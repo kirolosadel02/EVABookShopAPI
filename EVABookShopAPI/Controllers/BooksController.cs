@@ -6,7 +6,8 @@ using EVABookShopAPI.Service.Services.Books;
 namespace EVABookShop.Controllers
 {
     [ApiController]
-    [Route("api/v1/books")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/books")]
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
