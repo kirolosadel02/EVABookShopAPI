@@ -25,7 +25,7 @@ builder.Services.Scan(selector => selector
         .AsImplementedInterfaces()
         .WithScopedLifetime());
 
-builder.Services.AddAutoMapper(typeof(CategoryMappingProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(CategoryMappingProfile).Assembly, typeof(BookMappingProfile).Assembly);
 
 var app = builder.Build();
 
