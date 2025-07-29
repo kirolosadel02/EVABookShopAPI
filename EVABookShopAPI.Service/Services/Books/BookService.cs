@@ -3,6 +3,8 @@ using EVABookShopAPI.DB.Models;
 using EVABookShopAPI.Service.DTOs.BookDTO;
 using EVABookShopAPI.Service.DTOs.BookDTO.EVABookShop.DTOs;
 using EVABookShopAPI.UnitOfWork;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EVABookShopAPI.Service.Services.Books
 {
@@ -59,6 +61,42 @@ namespace EVABookShopAPI.Service.Services.Books
 
             _mapper.Map(model, book);
             book.CategoryId = category.Id;
+
+            await _unitOfWork.Repository<Book>().Update(book);
+            await _unitOfWork.SaveChanges();
+            return true;
+        }
+
+        public async Task<bool?> PatchBook(int id, JsonPatchDocument<BookUpdateDto> patchDoc, ModelStateDictionary modelState)
+        {
+            var book = _unitOfWork.Repository<Book>().GetById(id);
+            if (book == null)
+                return false;
+
+            var bookDto = _mapper.Map<BookUpdateDto>(book);
+
+            patchDoc.ApplyTo(bookDto, error =>
+            {
+                modelState.AddModelError("PatchError", error.ErrorMessage);
+            });
+
+            if (!modelState.IsValid)
+                return null;
+
+            if (patchDoc.Operations.Any(op => op.path.Equals("/CategoryName", StringComparison.OrdinalIgnoreCase)))
+            {
+                var category = _unitOfWork.Repository<Category>().GetAll().Result
+                    .FirstOrDefault(c => c.CatName.ToLower() == bookDto.CategoryName.ToLower());
+
+                if (category == null)
+                {
+                    modelState.AddModelError("CategoryName", "Category not found.");
+                    return null;
+                }
+
+                book.CategoryId = category.Id;
+            }
+            _mapper.Map(bookDto, book);
 
             await _unitOfWork.Repository<Book>().Update(book);
             await _unitOfWork.SaveChanges();
