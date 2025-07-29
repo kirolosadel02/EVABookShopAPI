@@ -14,6 +14,9 @@ namespace EVABookShopAPI.DB
             base.OnModelCreating(modelBuilder);
             
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            // Seed data using the seeder class
+            DataSeeder.SeedData(modelBuilder);
         }
     }
 }

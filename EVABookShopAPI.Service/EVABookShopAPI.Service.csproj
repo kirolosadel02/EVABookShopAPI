@@ -12,9 +12,4 @@
     <ProjectReference Include="..\EVABookShopAPI.UnitOfWork\EVABookShopAPI.UnitOfWork.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
 </Project>

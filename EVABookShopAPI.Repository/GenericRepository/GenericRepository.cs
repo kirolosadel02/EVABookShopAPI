@@ -1,10 +1,6 @@
 using EVABookShopAPI.DB;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace EVABookShopAPI.Repository.GenericRepository
 {
@@ -21,18 +17,18 @@ namespace EVABookShopAPI.Repository.GenericRepository
 
         public async Task<List<TEntity>> GetByIds(Expression<Func<TEntity, bool>> wherePredicate, int[] ids, string columnName)
         {
-            return _dbSet
+            return await _dbSet
                 .Where(x => ids.Contains(EF.Property<int>(x, columnName))).Where(wherePredicate)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<List<TEntity>> GetByIds(Expression<Func<TEntity, bool>> wherePredicate, int[] ids)
         {
             var idName = _context.Model.FindEntityType(typeof(TEntity))
                 .FindPrimaryKey().Properties.Single().Name;
-            return _dbSet
+            return await _dbSet
                 .Where(x => ids.Contains(EF.Property<int>(x, idName))).Where(wherePredicate)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<List<TEntity>> GetByIds(Expression<Func<TEntity, bool>> wherePredicate, int[] ids, string columnName, List<string> include)
@@ -40,9 +36,9 @@ namespace EVABookShopAPI.Repository.GenericRepository
             var _dbSetQueryable = _context.Set<TEntity>().AsQueryable();
             foreach (var item in include)
                 _dbSetQueryable = _dbSetQueryable.Include(item);
-            return _dbSetQueryable
+            return await _dbSetQueryable
                 .Where(x => ids.Contains(EF.Property<int>(x, columnName))).Where(wherePredicate)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<List<TEntity>> GetByIds(Expression<Func<TEntity, bool>> wherePredicate, int[] ids, List<string> include)
@@ -52,9 +48,9 @@ namespace EVABookShopAPI.Repository.GenericRepository
             var _dbSetQueryable = _context.Set<TEntity>().AsQueryable();
             foreach (var item in include)
                 _dbSetQueryable = _dbSetQueryable.Include(item);
-            return _dbSetQueryable
+            return await _dbSetQueryable
                 .Where(x => ids.Contains(EF.Property<int>(x, idName))).Where(wherePredicate)
-                .ToList();
+                .ToListAsync();
         }
 
         public TEntity Add(TEntity entity)
@@ -65,6 +61,7 @@ namespace EVABookShopAPI.Repository.GenericRepository
         public async Task AddRange(IEnumerable<TEntity> entityList)
         {
             _dbSet.AddRange(entityList);
+            await Task.CompletedTask;
         }
 
         public TEntity Delete(int id)
@@ -81,8 +78,7 @@ namespace EVABookShopAPI.Repository.GenericRepository
 
         public async Task<IEnumerable<TEntity>> GetAll()
         {
-            var result = _dbSet.AsEnumerable();
-            return result;
+            return await _dbSet.ToListAsync();
         }
 
         public async Task<TEntity> Update(TEntity entity)
@@ -93,6 +89,7 @@ namespace EVABookShopAPI.Repository.GenericRepository
         public async Task UpdateRange(IEnumerable<TEntity> entity)
         {
             _dbSet.UpdateRange(entity);
+            await Task.CompletedTask;
         }
 
         public async Task<TEntity> FirstOrDefault()
@@ -202,13 +199,14 @@ namespace EVABookShopAPI.Repository.GenericRepository
             var _dbSetQueryable = _context.Set<TEntity>().AsQueryable();
             foreach (var item in include)
                 _dbSetQueryable = _dbSetQueryable.Include(item);
-            var result = _dbSetQueryable.AsEnumerable();
+            var result = await _dbSetQueryable.ToListAsync();
             return result;
         }
 
         public async Task RemoveRange(IEnumerable<TEntity> myObject)
         {
             _dbSet.RemoveRange(myObject);
+            await Task.CompletedTask;
         }
 
         public async Task<object> FirstOrDefault(Expression<Func<TEntity, bool>> wherePredicate, Expression<Func<TEntity, object>> selectPredicate, List<string> include)
