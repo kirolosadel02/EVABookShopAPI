@@ -1,11 +1,13 @@
 using EVABookShopAPI.DB;
 using Microsoft.EntityFrameworkCore;
 using Scrutor;
+using EVABookShopAPI.Service.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<EVABookShopAPIContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -22,6 +24,8 @@ builder.Services.Scan(selector => selector
         .UsingRegistrationStrategy(RegistrationStrategy.Skip)
         .AsImplementedInterfaces()
         .WithScopedLifetime());
+
+builder.Services.AddAutoMapper(typeof(CategoryMappingProfile).Assembly);
 
 var app = builder.Build();
 

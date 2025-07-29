@@ -233,5 +233,17 @@ namespace EVABookShopAPI.Repository.GenericRepository
                 ? _context.Set<TEntity>().Where(predicate).AsNoTracking()
                 : _context.Set<TEntity>().Where(predicate);
         }
+
+        public IQueryable<TEntity> GetAllQueryable(List<string> include = null)
+        {
+            var query = _context.Set<TEntity>().AsQueryable();
+            if (include != null)
+            {
+                foreach (var item in include)
+                    query = query.Include(item);
+            }
+            return query;
+        }
+
     }
 } 

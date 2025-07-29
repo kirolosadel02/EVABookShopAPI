@@ -38,5 +38,7 @@ namespace EVABookShopAPI.Repository.GenericRepository
         Task<IEnumerable<TEntity>> GetAll(List<string> include);
         Task RemoveRange(IEnumerable<TEntity> myObject);
         IQueryable<TEntity> FindBy(Expression<Func<TEntity, bool>> predicate, bool disableTracking = true);
+        IQueryable<TEntity> GetAllQueryable(List<string> includes = null);
+
     }
 } 

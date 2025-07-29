@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\EVABookShopAPI.DB\EVABookShopAPI.DB.csproj" />
     <ProjectReference Include="..\EVABookShopAPI.Repository\EVABookShopAPI.Repository.csproj" />
     <ProjectReference Include="..\EVABookShopAPI.UnitOfWork\EVABookShopAPI.UnitOfWork.csproj" />

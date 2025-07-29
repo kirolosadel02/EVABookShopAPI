@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using EVABookShopAPI.Service.Services.Categories;
 using EVABookShopAPI.Service.DTOs.CategoryDTO;
+using EVABookShopAPI.Service.DTOs;
+using EVABookShopAPI.Service.Pagination;
 
 namespace EVABookShopAPI.Controllers
 {
@@ -18,12 +20,22 @@ namespace EVABookShopAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CategoryDto>>> GetAll() =>
             Ok(await _categoryService.GetAllCategoriesAsync());
-        
+
+        // New paginated endpoint
+        [HttpGet("paginated")]
+        public async Task<ActionResult<PaginatedResult<CategoryDto>>> GetPaginated([FromQuery] PaginationDto pagination)
+        {
+            if (pagination.Page < 1) pagination.Page = 1;
+            if (pagination.PageSize < 1) pagination.PageSize = 5;
+            if (pagination.PageSize > 100) pagination.PageSize = 100;
+
+            return Ok(await _categoryService.GetPaginatedCategoriesAsync(pagination));
+        }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryDto>> GetById(int id) =>
             Ok(await _categoryService.GetCategoryByIdAsync(id));
-        
+
         [HttpPost]
         public async Task<ActionResult<bool>> Create([FromBody] CategoryCreateDto model) =>
             Ok(await _categoryService.CreateCategoryAsync(model));
@@ -31,7 +43,7 @@ namespace EVABookShopAPI.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<bool>> Update(int id, [FromBody] CategoryUpdateDto model) =>
             Ok(await _categoryService.UpdateCategoryAsync(id, model));
-        
+
         [HttpDelete("{id}")]
         public async Task<ActionResult<bool>> Delete(int id) =>
             Ok(await _categoryService.DeleteCategoryAsync(id));

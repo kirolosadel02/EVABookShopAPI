@@ -1,10 +1,13 @@
-﻿using EVABookShopAPI.Service.DTOs.CategoryDTO;
+﻿using EVABookShopAPI.Service.DTOs;
+using EVABookShopAPI.Service.DTOs.CategoryDTO;
+using EVABookShopAPI.Service.Pagination;
 
 namespace EVABookShopAPI.Service.Services.Categories
 {
     public interface ICategoryService
     {
         Task<List<CategoryDto>> GetAllCategoriesAsync();
+        Task<PaginatedResult<CategoryDto>> GetPaginatedCategoriesAsync(PaginationDto pagination);
         Task<CategoryDto> GetCategoryByIdAsync(int id);
         Task<bool> CreateCategoryAsync(CategoryCreateDto model);
         Task<bool> UpdateCategoryAsync(int id, CategoryUpdateDto model);

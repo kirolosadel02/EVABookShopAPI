@@ -1,31 +1,55 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿
+using AutoMapper;
 using EVABookShopAPI.DB.Models;
 using EVABookShopAPI.UnitOfWork;
 using EVABookShopAPI.Service.DTOs.CategoryDTO;
+using EVABookShopAPI.Service.DTOs;
+using EVABookShopAPI.Service.Pagination;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace EVABookShopAPI.Service.Services.Categories
 {
     public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public CategoryService(IUnitOfWork unitOfWork)
+        public CategoryService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
         public async Task<List<CategoryDto>> GetAllCategoriesAsync()
         {
             var categories = await _unitOfWork.Repository<Category>().GetAll();
-            return categories.Select(c => new CategoryDto
+            return _mapper.Map<List<CategoryDto>>(categories);
+        }
+
+        public async Task<PaginatedResult<CategoryDto>> GetPaginatedCategoriesAsync(PaginationDto pagination)
+        {
+            var query = _unitOfWork.Repository<Category>()
+                .GetAllQueryable()
+                .OrderBy(c => c.CatOrder)
+                .ThenByDescending(c => c.CatName);
+
+            var totalCount = await query.CountAsync();
+
+            var categories = await query
+                .Skip(pagination.Skip)
+                .Take(pagination.PageSize)
+                .ToListAsync();
+
+            var categoryDtos = _mapper.Map<List<CategoryDto>>(categories);
+
+            return new PaginatedResult<CategoryDto>
             {
-                Id = c.Id,
-                CatName = c.CatName,
-                CatOrder = c.CatOrder,
-                IsActive = !c.MarkedAsDeleted
-            }).ToList();
+                Data = categoryDtos,
+                TotalCount = totalCount,
+                Page = pagination.Page,
+                PageSize = pagination.PageSize
+            };
         }
 
         public async Task<CategoryDto> GetCategoryByIdAsync(int id)
@@ -33,13 +57,7 @@ namespace EVABookShopAPI.Service.Services.Categories
             var category = await Task.Run(() => _unitOfWork.Repository<Category>().GetById(id));
             if (category == null) return null;
 
-            return new CategoryDto
-            {
-                Id = category.Id,
-                CatName = category.CatName,
-                CatOrder = category.CatOrder,
-                IsActive = !category.MarkedAsDeleted
-            };
+            return _mapper.Map<CategoryDto>(category);
         }
 
         public async Task<bool> CreateCategoryAsync(CategoryCreateDto model)
@@ -62,12 +80,7 @@ namespace EVABookShopAPI.Service.Services.Categories
             }
             else
             {
-                var category = new Category
-                {
-                    CatName = model.CatName,
-                    CatOrder = model.CatOrder,
-                    MarkedAsDeleted = false
-                };
+                var category = _mapper.Map<Category>(model);
                 repo.Add(category);
             }
 
@@ -91,8 +104,7 @@ namespace EVABookShopAPI.Service.Services.Categories
                 }
             }
 
-            category.CatName = model.CatName;
-            category.CatOrder = model.CatOrder;
+            _mapper.Map(model, category);
             await repo.Update(category);
             await _unitOfWork.SaveChanges();
             return true;
