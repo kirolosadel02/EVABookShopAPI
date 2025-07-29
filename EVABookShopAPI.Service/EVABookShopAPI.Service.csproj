@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EVABookShopAPI.DB\EVABookShopAPI.DB.csproj" />
+    <ProjectReference Include="..\EVABookShopAPI.Repository\EVABookShopAPI.Repository.csproj" />
+    <ProjectReference Include="..\EVABookShopAPI.UnitOfWork\EVABookShopAPI.UnitOfWork.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DTOs\" />
+    <Folder Include="Services\" />
+  </ItemGroup>
+
+</Project>
