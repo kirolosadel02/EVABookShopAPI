@@ -17,22 +17,19 @@ builder.Services.AddResponseCaching();
 // Register controllers and configure cache profiles
 builder.Services.AddControllers(options =>
 {
-    options.CacheProfiles.Add("Default30", new Microsoft.AspNetCore.Mvc.CacheProfile
+    options.CacheProfiles.Add("Default30", new CacheProfile
     {
         Duration = 30,
-        Location = Microsoft.AspNetCore.Mvc.ResponseCacheLocation.Client,
+        Location = ResponseCacheLocation.Client,
         NoStore = false
     });
-    options.CacheProfiles.Add("Server60", new Microsoft.AspNetCore.Mvc.CacheProfile
+    options.CacheProfiles.Add("Server60", new CacheProfile
     {
         Duration = 60,
-        Location = Microsoft.AspNetCore.Mvc.ResponseCacheLocation.Any,
+        Location = ResponseCacheLocation.Any,
         NoStore = false
     });
-});
-
-// Add JsonPatch support
-builder.Services.AddMvc().AddNewtonsoftJson();
+}).AddNewtonsoftJson();
 
 // Configure API Versioning
 builder.Services.AddApiVersioning(options =>

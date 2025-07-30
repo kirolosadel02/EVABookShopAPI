@@ -1,12 +1,10 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using EVABookShopAPI.DB.Models;
 using EVABookShopAPI.UnitOfWork;
 using EVABookShopAPI.Service.DTOs.CategoryDTO;
 using EVABookShopAPI.Service.DTOs;
 using EVABookShopAPI.Service.Pagination;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 
 namespace EVABookShopAPI.Service.Services.Categories
 {
@@ -29,6 +27,10 @@ namespace EVABookShopAPI.Service.Services.Categories
 
         public async Task<PaginatedResult<CategoryDto>> GetPaginatedCategoriesAsync(PaginationDto pagination)
         {
+            if (pagination.Page < 1) pagination.Page = 1;
+            if (pagination.PageSize < 1) pagination.PageSize = 5;
+            if (pagination.PageSize > 100) pagination.PageSize = 100;
+
             var query = _unitOfWork.Repository<Category>()
                 .GetAllQueryable()
                 .OrderBy(c => c.CatOrder)
@@ -51,6 +53,7 @@ namespace EVABookShopAPI.Service.Services.Categories
                 PageSize = pagination.PageSize
             };
         }
+
 
         public async Task<CategoryDto> GetCategoryByIdAsync(int id)
         {

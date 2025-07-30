@@ -4,6 +4,7 @@ using EVABookShopAPI.Service.DTOs.BookDTO;
 using EVABookShopAPI.Service.DTOs.BookDTO.EVABookShop.DTOs;
 using EVABookShopAPI.UnitOfWork;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EVABookShopAPI.Service.Services.Books
@@ -112,6 +113,60 @@ namespace EVABookShopAPI.Service.Services.Books
             _unitOfWork.Repository<Book>().Delete(book.Id);
             await _unitOfWork.SaveChanges();
             return true;
+        }
+
+        public async Task<IActionResult> CreateBookResult(BookCreateDto model, ModelStateDictionary modelState)
+        {
+            if (!modelState.IsValid)
+                return new BadRequestObjectResult(modelState);
+
+            var result = await CreateBook(model);
+            return result
+                ? new OkObjectResult(new { Message = "Book created successfully." })
+                : new NotFoundObjectResult("Category not found.");
+        }
+
+        public async Task<IActionResult> UpdateBookResult(int id, BookUpdateDto model, ModelStateDictionary modelState)
+        {
+            if (!modelState.IsValid)
+                return new BadRequestObjectResult(modelState);
+
+            var result = await UpdateBook(id, model);
+            return result
+                ? new OkObjectResult(new { Message = "Book updated successfully." })
+                : new NotFoundObjectResult("Book or Category not found.");
+        }
+
+        public async Task<IActionResult> PatchBookResult(int id, JsonPatchDocument<BookUpdateDto> patchDoc, ModelStateDictionary modelState)
+        {
+            if (patchDoc == null)
+                return new BadRequestObjectResult("Patch document is null.");
+
+            var result = await PatchBook(id, patchDoc, modelState);
+
+            if (!modelState.IsValid)
+                return new BadRequestObjectResult(modelState);
+
+            return result switch
+            {
+                true => new OkObjectResult(new { Message = "Book updated successfully." }),
+                false => new NotFoundObjectResult("Book or Category not found."),
+                null => new BadRequestObjectResult("Invalid patch operation.")
+            };
+        }
+
+        public async Task<IActionResult> DeleteBookResult(int id)
+        {
+            var result = await DeleteBook(id);
+            return result
+                ? new OkObjectResult(new { Message = "Book deleted successfully." })
+                : new NotFoundResult();
+        }
+
+        public async Task<IActionResult> GetBookDtoResultById(int id)
+        {
+            var book = await GetBookById(id);
+            return book == null ? new NotFoundResult() : new OkObjectResult(book);
         }
     }
 }
