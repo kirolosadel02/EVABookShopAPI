@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35913.81 d17.13
+VisualStudioVersion = 17.13.35913.81
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVABookShopAPI", "EVABookShopAPI\EVABookShopAPI.csproj", "{97D96922-8C84-4049-AF33-D41F47D09092}"
 EndProject
@@ -12,6 +12,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVABookShopAPI.UnitOfWork", "EVABookShopAPI.UnitOfWork\EVABookShopAPI.UnitOfWork.csproj", "{E48EE9C7-A374-40BB-90CE-89A04EB2539C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVABookShopAPI.Service", "EVABookShopAPI.Service\EVABookShopAPI.Service.csproj", "{8DDF9A00-A9C2-4CB5-9D5C-2AC6D0552C85}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EVABookShopAPI.UnitTests", "EVABookShopAPI.UnitTests\EVABookShopAPI.UnitTests.csproj", "{5BE02156-C63E-43C4-8D47-9CE479EAA98D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{8DDF9A00-A9C2-4CB5-9D5C-2AC6D0552C85}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DDF9A00-A9C2-4CB5-9D5C-2AC6D0552C85}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8DDF9A00-A9C2-4CB5-9D5C-2AC6D0552C85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BE02156-C63E-43C4-8D47-9CE479EAA98D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BE02156-C63E-43C4-8D47-9CE479EAA98D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BE02156-C63E-43C4-8D47-9CE479EAA98D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BE02156-C63E-43C4-8D47-9CE479EAA98D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

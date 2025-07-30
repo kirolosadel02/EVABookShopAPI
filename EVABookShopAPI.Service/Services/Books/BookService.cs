@@ -26,7 +26,7 @@ namespace EVABookShopAPI.Service.Services.Books
             return _mapper.Map<List<BookDto>>(books);
         }
 
-        public async Task<BookDto?> GetBookById(int id)
+        public async Task<BookDto> GetBookById(int id)
         {
             var book = _unitOfWork.Repository<Book>().GetById(id, new List<string> { "Category" });
             return book == null ? null : _mapper.Map<BookDto>(book);
