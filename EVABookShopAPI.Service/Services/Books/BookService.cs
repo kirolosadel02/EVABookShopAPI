@@ -115,33 +115,28 @@ namespace EVABookShopAPI.Service.Services.Books
             return true;
         }
 
-        public async Task<IActionResult> CreateBookResult(BookCreateDto model, ModelStateDictionary modelState)
+        public async Task<IActionResult> CreateBookResult(BookCreateDto model)
         {
-            if (!modelState.IsValid)
-                return new BadRequestObjectResult(modelState);
-
             var result = await CreateBook(model);
             return result
                 ? new OkObjectResult(new { Message = "Book created successfully." })
                 : new NotFoundObjectResult("Category not found.");
         }
 
-        public async Task<IActionResult> UpdateBookResult(int id, BookUpdateDto model, ModelStateDictionary modelState)
+        public async Task<IActionResult> UpdateBookResult(int id, BookUpdateDto model)
         {
-            if (!modelState.IsValid)
-                return new BadRequestObjectResult(modelState);
-
             var result = await UpdateBook(id, model);
             return result
                 ? new OkObjectResult(new { Message = "Book updated successfully." })
                 : new NotFoundObjectResult("Book or Category not found.");
         }
 
-        public async Task<IActionResult> PatchBookResult(int id, JsonPatchDocument<BookUpdateDto> patchDoc, ModelStateDictionary modelState)
+        public async Task<IActionResult> PatchBookResult(int id, JsonPatchDocument<BookUpdateDto> patchDoc)
         {
             if (patchDoc == null)
                 return new BadRequestObjectResult("Patch document is null.");
 
+            var modelState = new ModelStateDictionary();
             var result = await PatchBook(id, patchDoc, modelState);
 
             if (!modelState.IsValid)
@@ -154,6 +149,7 @@ namespace EVABookShopAPI.Service.Services.Books
                 null => new BadRequestObjectResult("Invalid patch operation.")
             };
         }
+
 
         public async Task<IActionResult> DeleteBookResult(int id)
         {

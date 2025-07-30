@@ -29,15 +29,16 @@ namespace EVABookShop.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] BookCreateDto model) =>
-            await _bookService.CreateBookResult(model, ModelState);
+            await _bookService.CreateBookResult(model);
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookUpdateDto model) =>
-            await _bookService.UpdateBookResult(id, model, ModelState);
+            await _bookService.UpdateBookResult(id, model);
 
         [HttpPatch("{id}")]
         public async Task<IActionResult> PatchBook(int id, [FromBody] JsonPatchDocument<BookUpdateDto> patchDoc) =>
-            await _bookService.PatchBookResult(id, patchDoc, ModelState);
+            await _bookService.PatchBookResult(id, patchDoc);
+
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBook(int id) =>

@@ -14,9 +14,9 @@ namespace EVABookShopAPI.Service.Services.Books
         Task<bool> UpdateBook(int id, BookUpdateDto model);
         Task<bool?> PatchBook(int id, JsonPatchDocument<BookUpdateDto> patchDoc, ModelStateDictionary modelState);
         Task<bool> DeleteBook(int id);
-        Task<IActionResult> CreateBookResult(BookCreateDto model, ModelStateDictionary modelState);
-        Task<IActionResult> UpdateBookResult(int id, BookUpdateDto model, ModelStateDictionary modelState);
-        Task<IActionResult> PatchBookResult(int id, JsonPatchDocument<BookUpdateDto> patchDoc, ModelStateDictionary modelState);
+        Task<IActionResult> CreateBookResult(BookCreateDto model);
+        Task<IActionResult> UpdateBookResult(int id, BookUpdateDto model);
+        Task<IActionResult> PatchBookResult(int id, JsonPatchDocument<BookUpdateDto> patchDoc);
         Task<IActionResult> DeleteBookResult(int id);
         Task<IActionResult> GetBookDtoResultById(int id);
 

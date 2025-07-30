@@ -78,7 +78,7 @@ namespace EVABookShopAPI.Service.Services.Categories
                 }
                 else
                 {
-                    return false; // Name already exists
+                    return false;
                 }
             }
             else

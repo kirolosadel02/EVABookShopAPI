@@ -4,6 +4,8 @@ using Scrutor;
 using EVABookShopAPI.Service.Mappings;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using FluentValidation.AspNetCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +82,29 @@ builder.Services.Scan(selector => selector
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(CategoryMappingProfile).Assembly, typeof(BookMappingProfile).Assembly);
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssembly(EVABookShopAPI.Service.AssemblyReference.Assembly, includeInternalTypes: true);
+builder.Services.Configure<ApiBehaviorOptions>(options =>
+{
+    options.InvalidModelStateResponseFactory = context =>
+    {
+        var errors = context.ModelState
+            .Where(e => e.Value.Errors.Count > 0)
+            .ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+        return new BadRequestObjectResult(new
+        {
+            Message = "Validation failed",
+            Errors = errors
+        });
+    };
+});
+
 
 var app = builder.Build();
 
