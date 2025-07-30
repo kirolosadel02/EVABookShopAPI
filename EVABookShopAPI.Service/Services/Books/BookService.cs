@@ -3,6 +3,7 @@ using EVABookShopAPI.DB.Models;
 using EVABookShopAPI.Service.DTOs.BookDTO;
 using EVABookShopAPI.Service.DTOs.BookDTO.EVABookShop.DTOs;
 using EVABookShopAPI.UnitOfWork;
+using FluentValidation;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -13,11 +14,19 @@ namespace EVABookShopAPI.Service.Services.Books
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IValidator<BookCreateDto> _createValidator;
+        private readonly IValidator<BookUpdateDto> _updateValidator;
 
-        public BookService(IUnitOfWork unitOfWork, IMapper mapper)
+        public BookService(
+            IUnitOfWork unitOfWork,
+            IMapper mapper,
+            IValidator<BookCreateDto> createValidator,
+            IValidator<BookUpdateDto> updateValidator)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _createValidator = createValidator;
+            _updateValidator = updateValidator;
         }
 
         public async Task<List<BookDto>> GetAllBooks()
@@ -114,17 +123,34 @@ namespace EVABookShopAPI.Service.Services.Books
             await _unitOfWork.SaveChanges();
             return true;
         }
-
+        
         public async Task<IActionResult> CreateBookResult(BookCreateDto model)
         {
-            var result = await CreateBook(model);
-            return result
-                ? new OkObjectResult(new { Message = "Book created successfully." })
-                : new NotFoundObjectResult("Category not found.");
+            var validationResult = await _createValidator.ValidateAsync(model);
+            if (!validationResult.IsValid)
+                return new BadRequestObjectResult(validationResult.ToDictionary());
+
+            var category = _unitOfWork.Repository<Category>().GetAll().Result
+                .FirstOrDefault(c => c.CatName.ToLower() == model.CategoryName.ToLower());
+
+            if (category == null)
+                return new NotFoundObjectResult("Category not found.");
+
+            var book = _mapper.Map<Book>(model);
+            book.CategoryId = category.Id;
+
+            _unitOfWork.Repository<Book>().Add(book);
+            await _unitOfWork.SaveChanges();
+
+            return new OkObjectResult(new { Message = "Book created successfully." });
         }
 
         public async Task<IActionResult> UpdateBookResult(int id, BookUpdateDto model)
         {
+            var validationResult = await _updateValidator.ValidateAsync(model);
+            if (!validationResult.IsValid)
+                return new BadRequestObjectResult(validationResult.ToDictionary());
+
             var result = await UpdateBook(id, model);
             return result
                 ? new OkObjectResult(new { Message = "Book updated successfully." })
@@ -161,6 +187,9 @@ namespace EVABookShopAPI.Service.Services.Books
 
         public async Task<IActionResult> GetBookDtoResultById(int id)
         {
+            if (id <= 0)
+                return new BadRequestResult();
+
             var book = await GetBookById(id);
             return book == null ? new NotFoundResult() : new OkObjectResult(book);
         }

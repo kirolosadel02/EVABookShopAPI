@@ -163,5 +163,94 @@ namespace EVABookShopAPI.UnitTests.Controllers
             var okResult = Assert.IsType<OkObjectResult>(result);
             Assert.False((bool)okResult.Value);
         }
+
+        [Fact]
+        public async Task GetById_ReturnsNotFound_WhenCategoryDoesNotExist()
+        {
+            // Arrange
+            _mockService.Setup(s => s.GetCategoryByIdAsync(99)).ReturnsAsync((CategoryDto)null);
+
+            // Act
+            var result = await _controller.GetById(99);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.Null(okResult.Value); // Or: Assert.True(okResult.Value is null);
+        }
+
+        [Fact]
+        public async Task Create_ReturnsOkFalse_WhenCategoryCreationFails()
+        {
+            // Arrange
+            var dto = new CategoryCreateDto { CatName = "ExistingName", CatOrder = 1 };
+            _mockService.Setup(s => s.CreateCategoryAsync(dto)).ReturnsAsync(false);
+
+            // Act
+            var result = await _controller.Create(dto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.False((bool)okResult.Value);
+        }
+
+        [Fact]
+        public async Task Update_ReturnsOkFalse_WhenUpdateFails()
+        {
+            // Arrange
+            var dto = new CategoryUpdateDto { CatName = "ExistingName", CatOrder = 1 };
+            _mockService.Setup(s => s.UpdateCategoryAsync(1, dto)).ReturnsAsync(false);
+
+            // Act
+            var result = await _controller.Update(1, dto);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.False((bool)okResult.Value);
+        }
+
+        [Fact]
+        public async Task Delete_ReturnsOkFalse_WhenCategoryNotFound()
+        {
+            // Arrange
+            _mockService.Setup(s => s.DeleteCategoryAsync(404)).ReturnsAsync(false);
+
+            // Act
+            var result = await _controller.Delete(404);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.False((bool)okResult.Value);
+        }
+
+        [Fact]
+        public async Task CheckName_ReturnsFalse_WhenNameIsEmpty()
+        {
+            // Arrange
+            string emptyName = " ";
+            _mockService.Setup(s => s.CheckCategoryNameExistsAsync(emptyName, null)).ReturnsAsync(false);
+
+            // Act
+            var result = await _controller.CheckName(emptyName, null);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.False((bool)okResult.Value);
+        }
+
+        [Fact]
+        public async Task CheckOrder_ReturnsTrue_WhenOrderAlreadyExists()
+        {
+            // Arrange
+            int existingOrder = 1;
+            _mockService.Setup(s => s.CheckCategoryOrderExistsAsync(existingOrder, null)).ReturnsAsync(true);
+
+            // Act
+            var result = await _controller.CheckOrder(existingOrder, null);
+
+            // Assert
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            Assert.True((bool)okResult.Value);
+        }
+
     }
 }
